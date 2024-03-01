@@ -17,7 +17,7 @@ jobs:
   authorize:
     name: Authorize external pull request
     uses: ./.github/workflows/authorize-external-pr.yml
-    
+
   scope:
     name: Computed changed state
     needs: [ authorize ]
@@ -25,7 +25,7 @@ jobs:
     with:
       ref: refs/pull/${{github.event.pull_request.number}}/merge
     secrets: inherit
-  
+
   publish:
     name: Publish canary version
     needs: [ authorize, scope ]
@@ -33,7 +33,7 @@ jobs:
     with:
       ref: refs/pull/${{github.event.pull_request.number}}/merge
       upload_assets: ${{ needs.scope.outputs.HAS_ASSETS == 'true' }}
-      auto-options: '--no-changelog'
+      auto-options: '--no-changelog --dry-run'
     secrets:
       gh_token: ${{ secrets.GH_TOKEN }}
       npm_registry_token: ${{ secrets.NPM_REGISTRY_TOKEN }}
