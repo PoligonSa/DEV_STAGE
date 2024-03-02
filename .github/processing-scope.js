@@ -1,15 +1,15 @@
-const CYPRESS_SCOPE = ['@salutejs/plasma-web', '@salutejs/plasma-b2c', '@salutejs/plasma-ui'];
+// HAS_ASSETS - это флаг для управления логикой "@auto-it" плагина upload-assets-extend
+// Изменения в plasma-tokens или plasma-tokens-utils так же повлияют на то что в packagesList окажется plasma-tokens-native
 
 module.exports = () => {
-    const { CHANGED_STATE, AS_ENUMERATION } = process.env;
+    const { RAW_DATA, PACKAGES_CYPRESS, PACKAGES_DS } = process.env;
 
     /**
-     *
-     * @param CHANGED_STATE Information about the changed state
-     * @param CHANGED_STATE.name The name of the package.
-     * @param CHANGED_STATE.version The version of the package.
-     * @param CHANGED_STATE.private The type of the package.
-     * @param CHANGED_STATE.location The path of the package.
+     * @param RAW_DATA Information about the changed state
+     * @param RAW_DATA.name The name of the package.
+     * @param RAW_DATA.version The version of the package.
+     * @param RAW_DATA.private The type of the package.
+     * @param RAW_DATA.location The path of the package.
      *
      * @example
      * {
@@ -19,76 +19,57 @@ module.exports = () => {
      *   "location": "/Users/workspace/plasma/website/plasma-website"
      *  }
      */
-    const changedState = JSON.parse(JSON.parse(CHANGED_STATE));
+    const rawData = JSON.parse(RAW_DATA).map(({ name }) => name);
 
-    if (!changedState || !changedState.length) {
-        return { SCOPE: [], HAS_SCOPE: false };
+    const packagesCypress = JSON.parse(PACKAGES_CYPRESS);
+
+    const packagesDS = JSON.parse(PACKAGES_DS);
+
+    if (!rawData || !rawData.length) {
+        return {
+            RAW_DATA: [],
+            PACKAGES_CYPRESS_RUN: [],
+            PACKAGES_DOCUMENTATIONS_RUN: [],
+            PROCESSED_DATA: [],
+            HAS_PACKAGES_CYPRESS_RUN: false,
+            HAS_PACKAGES_DS_CHANGES: false,
+            HAS_ASSETS: false,
+        };
     }
 
     /**
-     * @example
-     * ['@salutejs/plasma-ui-docs', '@salutejs/plasma-ui', '@salutejs/plasma-core']
-     */
-    const packagesList = changedState.map(({ name }) => name);
-
-    const HAS_PLASMA_UI_DOCS = packagesList.includes('@salutejs/plasma-ui-docs');
-    const HAS_PLASMA_WEB_DOCS = packagesList.includes('@salutejs/plasma-web-docs');
-
-    const HAS_PLASMA_UI = packagesList.includes('@salutejs/plasma-ui');
-    const HAS_PLASMA_WEB = packagesList.includes('@salutejs/plasma-web');
-    const HAS_PLASMA_B2C = packagesList.includes('@salutejs/plasma-b2c');
-    const HAS_PLASMA_HOPE = packagesList.includes('@salutejs/plasma-new-hope');
-    const HAS_PLASMA_ASDK = packagesList.includes('@salutejs/plasma-asdk');
-    const HAS_CALDERA = packagesList.includes('@salutejs/caldera');
-    const HAS_CALDERA_ONLINE = packagesList.includes('@salutejs/caldera-online');
-    const HAS_SDDS_SERV = packagesList.includes('@salutejs/sdds-serv');
-    const HAS_PLASMA_WEBSITE = packagesList.includes('@salutejs/plasma-website');
-
-    const HAS_DOCUMENTATION_CHANGED =
-        HAS_PLASMA_WEBSITE ||
-        HAS_PLASMA_UI_DOCS ||
-        HAS_PLASMA_WEB_DOCS ||
-        HAS_PLASMA_ASDK ||
-        HAS_CALDERA ||
-        HAS_CALDERA_ONLINE ||
-        HAS_SDDS_SERV;
-
-    // Флаг для управления логикой "@auto-it" плагина upload-assets-extend
-    // Изменения в plasma-tokens или plasma-tokens-utils так же повлияют на то что в packagesList окажется plasma-tokens-native
-    const HAS_ASSETS = packagesList.includes('@salutejs/plasma-tokens-native');
-
-    /**
-     * List short packages name
+     * List short packages name for run cypress test
      * @example
      * ["web", "ui", "b2c"]
      */
-    const scope = packagesList.filter((item) => CYPRESS_SCOPE.includes(item)).map((item) => `"${item.split('-')[1]}"`);
+    const PACKAGES_CYPRESS_RUN = rawData
+        .filter((item) => packagesCypress.includes(item))
+        .map((item) => item.replace('@salutejs/', '').replace('plasma-', ''));
 
     /**
-     * Enumeration packages name
+     * List packages who has a documentations artifacts: storybook, docusaurus
      * @example
-     * ["plasma-web", "plasma-ui", "plasma-b2c"]
+     * ["plasma-web", "caldera", "sdds-serv"]
      */
-    const packagesEnumeration = AS_ENUMERATION === 'true' ? packagesList.map((item) => `"${item.split('/')[1]}"`) : [];
 
-    console.log('packagesEnumeration =>', packagesEnumeration);
-    console.log('packagesList =>', packagesList);
+    const PACKAGES_DOCUMENTATIONS_RUN = rawData
+        .filter((item) => packagesDS.includes(item))
+        .map((item) => item.replace('@salutejs/', ''));
+
+    /**
+     * Processed data - packages name without "@salutejs/"
+     * @example
+     * ["plasma-web", "plasma-ui", "caldera"]
+     */
+    const processedData = rawData.map((item) => item.replace('@salutejs/', ''));
 
     return {
-        SCOPE: JSON.stringify(scope),
-        PACKAGES_ENUMERATION: JSON.stringify(packagesEnumeration),
-        HAS_SCOPE: Boolean(scope.length),
-        HAS_DOCUMENTATION_CHANGED,
-        HAS_PLASMA_UI_DOCS,
-        HAS_PLASMA_WEB_DOCS,
-        HAS_PLASMA_UI,
-        HAS_PLASMA_WEB,
-        HAS_PLASMA_B2C,
-        HAS_PLASMA_HOPE,
-        HAS_PLASMA_ASDK,
-        HAS_ASSETS,
-        HAS_CALDERA,
-        HAS_CALDERA_ONLINE,
-        HAS_SDDS_SERV,
+        RAW_DATA: JSON.stringify(rawData),
+        PACKAGES_DOCUMENTATIONS_RUN: JSON.stringify(PACKAGES_DOCUMENTATIONS_RUN),
+        PACKAGES_CYPRESS_RUN: JSON.stringify(PACKAGES_CYPRESS_RUN),
+        PROCESSED_DATA: JSON.stringify(processedData),
+        HAS_PACKAGES_CYPRESS_RUN: !!PACKAGES_CYPRESS_RUN.length,
+        HAS_PACKAGES_DS_CHANGES: !!PACKAGES_DOCUMENTATIONS_RUN.length,
+        HAS_ASSETS: rawData.includes('@salutejs/plasma-tokens-native'),
     };
 };
