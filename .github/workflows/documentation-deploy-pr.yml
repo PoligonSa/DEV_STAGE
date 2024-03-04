@@ -101,11 +101,12 @@ jobs:
                 env:
                     PROCESSED_DATA: ${{ toJSON(fromJson(needs.state.outputs.STATE).PROCESSED_DATA) }}
                     PACKAGE: ${{ matrix.package }}
-                    HAS_PACKAGE_DOCS: ${{ env.HAS_PACKAGE_DOCS }}
                 with:
                     result-encoding: string
                     script: |
                         const { PROCESSED_DATA, PACKAGE, HAS_PACKAGE_DOCS } = process.env;
+
+                        const [scopeDSName,...rest] = PACKAGE.split('-');
 
                         const packages = [
                            PACKAGE,
@@ -117,13 +118,17 @@ jobs:
                           'plasma-tokens-native',
                           'plasma-tokens-utils',
                           'plasma-docs-ui',
-                          `${PACKAGE}-themes`,
+                          `${scopeDSName}-themes`,
                           `${PACKAGE}-docs`,
                         ];
 
                         console.log("Required packages =>", packages);
 
                         const result = JSON.parse(PROCESSED_DATA).filter((package) => packages.includes(package));
+
+                        if (result.includes('plasma-tokens-native') && !result.includes('plasma-tokens')) {
+                            result.push('plasma-tokens');
+                        }
 
                         console.log('Result =>', result);
 
