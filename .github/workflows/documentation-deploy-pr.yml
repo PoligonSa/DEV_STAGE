@@ -108,6 +108,8 @@ jobs:
 
                         const [scopeDSName,...rest] = PACKAGE.split('-');
 
+                        const themes = `${scopeDSName}-themes`;
+
                         const packages = [
                            PACKAGE,
                           'plasma-core',
@@ -118,17 +120,23 @@ jobs:
                           'plasma-tokens-native',
                           'plasma-tokens-utils',
                           'plasma-docs-ui',
-                          `${scopeDSName}-themes`,
+                          themes,
                           `${PACKAGE}-docs`,
+                          'plasma-typo',
                         ];
 
                         console.log("Required packages =>", packages);
 
                         const result = JSON.parse(PROCESSED_DATA).filter((package) => packages.includes(package));
 
-                        if (result.includes('plasma-tokens-native') && !result.includes('plasma-tokens')) {
+                        if (result.includes('plasma-tokens-native')) {
                             result.push('plasma-tokens');
                             result.push('plasma-tokens-utils');
+                        }
+
+                        if (result.includes(themes)) {
+                            result.push('plasma-typo');
+                            result.push('data-themes');
                         }
 
                         console.log('Result =>', result);
