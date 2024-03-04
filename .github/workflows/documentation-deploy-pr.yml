@@ -128,6 +128,7 @@ jobs:
 
                         if (result.includes('plasma-tokens-native') && !result.includes('plasma-tokens')) {
                             result.push('plasma-tokens');
+                            result.push('plasma-tokens-utils');
                         }
 
                         console.log('Result =>', result);
