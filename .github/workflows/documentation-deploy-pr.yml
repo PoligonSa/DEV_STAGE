@@ -106,9 +106,9 @@ jobs:
                     script: |
                         const { PROCESSED_DATA, PACKAGE, HAS_PACKAGE_DOCS } = process.env;
 
-                        const [scopeDSName,...rest] = PACKAGE.split('-');
+                        const [scopeDSName] = PACKAGE.split('-');
 
-                        const themes = `${scopeDSName}-themes`;
+                        const themes = ['caldera-online'].includes(PACKAGE) ? `${PACKAGE}-themes` : `${scopeDSName}-themes`;
 
                         const packages = [
                            PACKAGE,
@@ -120,12 +120,10 @@ jobs:
                           'plasma-tokens-native',
                           'plasma-tokens-utils',
                           'plasma-docs-ui',
+                          'plasma-typo',
                           themes,
                           `${PACKAGE}-docs`,
-                          'plasma-typo',
                         ];
-
-                        console.log("Required packages =>", packages);
 
                         const result = JSON.parse(PROCESSED_DATA).filter((package) => packages.includes(package));
 
