@@ -121,7 +121,6 @@ jobs:
 
                         const packages = [
                            PACKAGE,
-                          'plasma-core',
                           'plasma-hope',
                           'plasma-new-hope',
                           'plasma-icons',
@@ -136,6 +135,7 @@ jobs:
                         const result = [
                             ...processedData.filter((package) => packages.includes(package)),
                             'plasma-docs-ui',
+                            'plasma-core',
                         ];
 
                         if (result.includes('plasma-tokens-native')) {
