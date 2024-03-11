@@ -28,7 +28,7 @@ jobs:
     deploy-website:
         name: Deploy website artifacts
         needs: [ state ]
-        if: ${{ github.event.action == 'opened' && fromJSON(needs.state.outputs.STATE).HAS_PACKAGES_DS_CHANGES }}
+        if: ${{ fromJSON(needs.state.outputs.STATE).HAS_PACKAGES_DS_CHANGES }}
 
         runs-on: ubuntu-latest
         env:
