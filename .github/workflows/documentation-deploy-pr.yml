@@ -120,6 +120,8 @@ jobs:
                         const themes = ['caldera-online'].includes(PACKAGE) ? `${PACKAGE}-themes` : `${scopeDSName}-themes`;
 
                         const packages = [
+                          'plasma-core',
+                          'plasma-icons',
                           'plasma-new-hope',
                           'plasma-tokens',
                           'plasma-tokens-native',
@@ -132,10 +134,7 @@ jobs:
                         const result = [
                             ...processedData.filter((package) => packages.includes(package)),
                             PACKAGE,
-                            'plasma-docs-ui',
-                            'plasma-core',
-                            'plasma-hope',
-                            'plasma-icons',
+                            'plasma-docs-ui'
                         ];
 
                         if (result.includes('plasma-tokens-native')) {
