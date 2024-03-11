@@ -33,6 +33,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             PR_NAME: pr-${{ github.event.number }}
+            PREFIX: pr/pr-${{ github.event.number }}
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -78,6 +79,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             PR_NAME: pr-${{ github.event.number }}
+            PREFIX: pr/pr-${{ github.event.number }}
         strategy:
             fail-fast: false
             matrix:
@@ -108,6 +110,8 @@ jobs:
 
                         const [scopeDSName] = PACKAGE.split('-');
 
+                        // INFO: Пока нет устойчивого правила для формирования пакетов `themes`
+                        // и где то используется одно слово, типа `plasma`, а где-то два `caldera-online`
                         const themes = ['caldera-online'].includes(PACKAGE) ? `${PACKAGE}-themes` : `${scopeDSName}-themes`;
 
                         const packages = [
@@ -192,36 +196,29 @@ jobs:
                     ./s3_build/${PR_NAME}/${{ env.SHORT_NAME }}-storybook/
                     s3://${{ secrets.AWS_S3_BUCKET_STABLE }}/pr/${PR_NAME}/${{ env.SHORT_NAME }}-storybook/
 
-    attache-links:
+    attache-comment:
         name: Create and attached links to pr body
         needs: [ state, deploy-artifacts ]
         runs-on: ubuntu-latest
-        env:
-            PR_NAME: pr-${{ github.event.number }}
         steps:
             -   uses: actions/checkout@v4
                 with:
                     show-progress: false
 
-            -   name: Post success comment
+            -   name: Create comment
+                id: comment-link
                 uses: actions/github-script@v7
                 env:
                     PACKAGES_DS: ${{ toJSON(fromJSON(needs.state.outputs.STATE).PACKAGES_DOCUMENTATIONS_RUN) }}
-                    BASE_URL: http://plasma.dev.internal.sberdevices.ru/pr/${{env.PR_NAME}}
+                    BASE_URL: ${{ vars.STAGE_STABLE }}/pr/pr-${{ github.event.number }}
                 with:
+                    result-encoding: string
                     script: |
                         const createSBLinks = require('./.github/create-storybook-links.js');
 
-                        const body = createSBLinks();
+                        return createSBLinks();
 
-                        const {
-                          issue: { number },
-                          repo: { owner, repo }
-                        } = context;
-
-                        github.rest.issues.createComment({
-                          issue_number: number,
-                          owner,
-                          repo,
-                          body,
-                        });
+            -   name: Attach comment
+                uses: marocchino/sticky-pull-request-comment@v2
+                with:
+                   message: ${{ steps.comment-link.outputs.result }}
