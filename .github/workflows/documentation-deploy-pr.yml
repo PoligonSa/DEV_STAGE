@@ -108,6 +108,8 @@ jobs:
                     script: |
                         const { PROCESSED_DATA, PACKAGE, HAS_PACKAGE_DOCS } = process.env;
 
+                        const processedData = JSON.parse(PROCESSED_DATA);
+
                         const [scopeDSName] = PACKAGE.split('-');
 
                         // INFO: Пока нет устойчивого правила для формирования пакетов `themes`
@@ -129,7 +131,7 @@ jobs:
                           `${PACKAGE}-docs`,
                         ];
 
-                        const result = JSON.parse(PROCESSED_DATA).filter((package) => packages.includes(package));
+                        const result = processedData.filter((package) => packages.includes(package));
 
                         if (result.includes('plasma-tokens-native')) {
                             result.push('plasma-tokens');
@@ -143,10 +145,10 @@ jobs:
 
                         console.log('Result =>', result);
 
-                        return result.join(',');
+                        return processedData.length > 1 ? `@salutejs/{${result.join(',')}}` : `@salutejs/${result[0]}`;
 
             -   name: Lerna bootstrap
-                run: npx lerna bootstrap --scope="@salutejs/{${{steps.lerna-scope.outputs.result}}}"
+                run: npx lerna bootstrap --scope="${{ steps.lerna-scope.outputs.result }}"
 
             -   name: Prepare directory
                 run: mkdir -p s3_build/${PR_NAME}
@@ -197,7 +199,7 @@ jobs:
                     s3://${{ secrets.AWS_S3_BUCKET_STABLE }}/pr/${PR_NAME}/${{ env.SHORT_NAME }}-storybook/
 
     attache-comment:
-        name: Create and attached links to pr body
+        name: Attached comment
         needs: [ state, deploy-artifacts ]
         runs-on: ubuntu-latest
         steps:
