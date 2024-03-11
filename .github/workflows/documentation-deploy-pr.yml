@@ -121,7 +121,6 @@ jobs:
 
                         const packages = [
                           'plasma-new-hope',
-                          'plasma-icons',
                           'plasma-tokens',
                           'plasma-tokens-native',
                           'plasma-tokens-utils',
@@ -136,6 +135,7 @@ jobs:
                             'plasma-docs-ui',
                             'plasma-core',
                             'plasma-hope',
+                            'plasma-icons',
                         ];
 
                         if (result.includes('plasma-tokens-native')) {
