@@ -125,13 +125,15 @@ jobs:
                           'plasma-tokens',
                           'plasma-tokens-native',
                           'plasma-tokens-utils',
-                          'plasma-docs-ui',
                           'plasma-typo',
                           themes,
                           `${PACKAGE}-docs`,
                         ];
 
-                        const result = processedData.filter((package) => packages.includes(package));
+                        const result = [
+                            ...processedData.filter((package) => packages.includes(package)),
+                            'plasma-docs-ui',
+                        ];
 
                         if (result.includes('plasma-tokens-native')) {
                             result.push('plasma-tokens');
@@ -145,7 +147,7 @@ jobs:
 
                         console.log('Result =>', result);
 
-                        return processedData.length > 1 ? `@salutejs/{${result.join(',')}}` : `@salutejs/${result[0]}`;
+                        return result.length > 1 ? `@salutejs/{${result.join(',')}}` : `@salutejs/${result[0]}`;
 
             -   name: Lerna bootstrap
                 run: npx lerna bootstrap --scope="${{ steps.lerna-scope.outputs.result }}"
