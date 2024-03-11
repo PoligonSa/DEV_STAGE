@@ -28,7 +28,7 @@ jobs:
     deploy-website:
         name: Deploy website artifacts
         needs: [ state ]
-        if: ${{ fromJSON(needs.state.outputs.STATE).HAS_PACKAGES_DS_CHANGES }}
+        if: ${{ github.event.action == 'opened' && fromJSON(needs.state.outputs.STATE).HAS_PACKAGES_DS_CHANGES }}
 
         runs-on: ubuntu-latest
         env:
@@ -46,7 +46,9 @@ jobs:
                 run: npx lerna bootstrap --scope="@salutejs/plasma-website"
 
             -   name: Prepare directory
-                run: mkdir -p s3_build/${PR_NAME}
+                run: |
+                    mkdir -p s3_build/${PR_NAME}
+                    echo "${{ github.event.action }}"
 
                 # TODO: https://github.com/salute-developers/plasma/issues/603
             -   name: Plasma Website
@@ -96,6 +98,7 @@ jobs:
                 run: |
                     echo "SHORT_NAME=$(echo ${{ matrix.package }} | sed -r 's/@salutejs\///g' | sed -r 's/plasma-//g')" >> $GITHUB_ENV
                     echo "HAS_PACKAGE_DOCS=$([ -d "./website/${{ matrix.package }}-docs" ] && echo true || echo false)" >> $GITHUB_ENV
+                    echo "${{ github.event.action }}"
 
             -   name: Get lerna scope
                 id: lerna-scope
