@@ -30,7 +30,6 @@
     "@docusaurus/preset-classic": "3.1.1",
     "@docusaurus/theme-live-codeblock": "3.1.1",
     "@mdx-js/react": "3.0.0",
-    "@salutejs/plasma-core": "1.153.1",
     "@salutejs/plasma-docs-ui": "0.203.0",
     "@salutejs/plasma-icons": "1.186.0",
     "@salutejs/plasma-tokens-b2b": "1.35.0",
