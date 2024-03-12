@@ -12,7 +12,6 @@
   "author": "Salute Frontend Team <salute.developers@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
-    "@salutejs/plasma-core": "^1.0.0",
     "react": ">=16.13.1",
     "react-dom": ">=16.13.1",
     "styled-components": "^5.1.1"
@@ -24,7 +23,6 @@
     "@babel/preset-env": "^7.15.4",
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
-    "@salutejs/plasma-core": "1.153.0",
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
